@@ -4,39 +4,26 @@
 using namespace std;
 
 #define VLOOP(v) for(auto it = v.begin(); it != v.end(); it++) cout << *it << " ";
-#define VVLOOP(v) for(int i = 0; i < v.size(); i++) VLOOP(v[i]) 
+#define VVLOOP(v) for(int i = 0; i < v.size(); i++) VLOOP(v[i])
 
+vector<vector<int>> solution(vector<vector<int>> routes, int val_etx) {
+	vector<vector<int>> answer;
 
-// sort의 조건식 메서드를 만들어서 진행해도 된다.
-bool sort_condition(const vector<int>&a, const vector<int>&b) {
-	return a[1] < b[1];
-}
-
-int solution(vector<vector<int>> routes) {
-	int answer = 0;
-	sort(routes.begin(), routes.end(), 
-		[](vector<int> a, vector<int> b) { // 여기서는 lamdba condition으로 바로 진행
-			return a[1] < b[1];
-		});
-	
-	int x = -30000;
-	for (int i = 0; i < routes.size(); i++) {
-		// 현재 위치가 첫번째보다 작거나 같고
-		if (x <= routes[i][0]) {
-			x = routes[i][1]; // 카메라 설치 위치
-			answer++;
+	// val_etx 비교를 통해서 원하는 vector를 삽입 후 sorting
+	for (int i = 0; i < routes.size(); i++)
+	{
+		vector<int> vec = routes[i];
+		if (routes[i][1] < val_etx) {
+			answer.push_back(vec);
 		}
 	}
+	VVLOOP(answer);
 
-	// VVLOOP(routes) 아쉽게도 줄바꿈이 안됨
-	/*for (int i = 0; i < routes.size(); i++) {
-		for (auto it = routes[i].begin(); it != routes[i].end(); it++) {
-			cout << *it << " ";
-		}
-		cout << endl;
-	}*/
-
-
+	sort(answer.begin(), answer.end(), 
+		[](vector<int>& a, vector<int>& b) {
+		return a[2] > b[2];
+	});
+	VVLOOP(answer);
 	return answer;
 }
 
@@ -45,8 +32,9 @@ int main() {
 	cin.tie(NULL); cout.tie(NULL);
 
 	vector<vector<int>> routes {
-		{-20, -15}, { -14, -5 }, { -18, -13 }, { -5, -3 }
+		{-20, 20230501, -15}, { -14, 20230412, -5 }, { -18, 20230701, -13 }, { -5, 20220912, -3 }
 	};
-	solution(routes);
+	int val_etx = 20230601;
+	solution(routes, val_etx);
 	return 0;
 }

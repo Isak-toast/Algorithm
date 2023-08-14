@@ -1,76 +1,60 @@
 #include <iostream>
-#include <map>
 #include <vector>
-#include <stack>
-#include <string>
-#include <set>
-#include <cmath>
 using namespace std;
 
-#define VLOOP(x) for(auto it = x.begin(); it != x.end(); it++) cout << *it << " ";
-#define VVLOOP(v) for(auto y = 0; y < v.size(); y++) for(auto it = v[y].begin(); it != v[y].end(); it++) cout << *it << " "; cout << endl;
+#define VLOOP(v) for(auto it = v.begin(); it != v.end(); it++) cout << *it << " ";
 
-vector<int> solution(vector<string> gems) {
-	vector<int> answer;
-	set<string> nodup_gems;
-	copy(gems.begin(), gems.end(), inserter(nodup_gems, nodup_gems.end())); // convert vector to set
-	
-	// two pointer
-	int k = nodup_gems.size();
-	int i = 0, j = 0;
-	map<string, int> jew_map;
-	
-	jew_map[gems[j]]++;
+int solution(vector<int>&in_vec, int k, int t);
+void func(int cur, int start, int depth, int goal, vector<int>&vec, int sum);
 
-	/*
-	문자열에 대해서 해싱하여 필요 시 인덱스처럼 키 매핑으로 찾도록 한다 -> Map
+/*
+순열과 조합 -> 경우의 수를 구할 때, 조합인지 순열인지 판단을 잘해야한다.
 
-	여기서는 포인터가 증가시키면 안되고 현재 위치를 받을 때 이전에 있다가 옮기는게 맞다.
+또한 고를 수 있는 숫자에 변동이 있는 것도 고려 -> 목표 k가 변하는 것을 반복
 
-	- 보석이 동일하지 않을 때 현재 j 위치를 이동하고 보석을 증가
-	- 보석이 동일하면 현재 i 위치의 보석까지 거리를 측정 -> 동일하지 않을 때까지 i를 증가
-	
-	
-	시간축은 현재값으로 진행한다.
-	*/
-	int len = gems.size() + 1; // 최소 거리
-	int l = i+1, r = j+1;
-	while (true) {
-		if (jew_map.size() >= k) { // 
-			jew_map[gems[i]]--;
-			if (len > (j - i)) {
-				len = j - i;
-				l = i + 1;
-				r = j + 1;
-			}
-			if (jew_map[gems[i]] == 0) jew_map.erase(gems[i]);
-			i++;
-		}
-		else {
-			j++;
-			if (j >= gems.size()) break;
-			jew_map[gems[j]]++;
-			if (jew_map.size() >= k) {
-				if (len > (j)) {
-					len = j - i;
-					l = i + 1;
-					r = j + 1;
-				}
-			}
-		}
+백트래킹과 이상값 변동 조합 문제라고 하자.
+
+arr는 1~15이기에 작음 arr[15]으로 시작 가능 -> k는 반복을 진행할 수 있을 정도로 작다.
+t는 백만 이하의 작은 값 -> 오버플로 걱정 없음
+*/
+int main() 
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL); cout.tie(NULL);
+
+	//vector<int> input{2, 5, 3, 8, 1};
+	//vector<int> input{1, 1, 2, 2};
+	vector<int> input{1, 2, 3, 2};
+	int k = 2;
+	int t = 2;
+
+	cout << solution(input, k, t);
+
+	return 0;
+}
+
+int cnt = 0;
+int solution(vector<int>& in_vec, int k, int t) 
+{
+	int answer = 0;
+
+	for (int i = k; i <= in_vec.size(); i++) {
+		func(0, 0, i, t, in_vec, 0);
 	}
-	answer.push_back(l);
-	answer.push_back(r);
+	answer = cnt;
 	return answer;
 }
 
-int main() {
-	ios::sync_with_stdio(false);
-	cin.tie(NULL); cout.tie(NULL);
-	vector<string> gems { "AA", "AA", "AA", "AB", "AC" };
-	vector<int> ans = solution(gems);
+void func(int cur, int start, int depth, int goal, vector<int>& vec, int sum)
+{
+	if (cur == depth) {
+		if (sum <= goal) cnt++;
+		return;
+	}
 
-	VLOOP(ans);
-	/*VLOOP(gems);
-	VVLOOP(gems);*/
-}	
+	if (sum > goal) return;
+
+	for (int i = start; i < vec.size(); i++) {
+		func(cur + 1, i+1, depth, goal, vec, sum + vec[i]);
+	}
+}
